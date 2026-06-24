@@ -1,0 +1,64 @@
+# Entorno virtual
+venv/
+.env/
+.venv/
+
+# Variables de entorno
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos compilados
+*.so
+*.pyd
+*.dll
+
+# Logs
+*.log
+
+# Cobertura y pruebas
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Alembic
+alembic/versions/*.pyc
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Distribución
+build/
+dist/@
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MyPy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Bases de datos locales (si usas SQLite para pruebas)
+*.db
+*.sqlite3
+
+# Archivos temporales
+tmp/
+temp/
+*.tmp
+
+# Archivos de configuración sensibles
+secrets.json
+credentials.json

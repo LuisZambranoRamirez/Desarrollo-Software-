@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/public/Home';
 import Especialidades from './pages/public/Especialidades';
+import Nosotros from './pages/public/Nosotros';
+import Contacto from './pages/public/Contacto';
 import LoginPaciente from './pages/public/LoginPaciente';
 import LoginMedico from './pages/public/LoginMedico';
 import DashboardPaciente from './pages/paciente/DashboardPaciente';
@@ -30,8 +32,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/especialidades" element={<Especialidades />} />
-        <Route path="/nosotros" element={<Home />} />
-        <Route path="/contacto" element={<Home />} />
+        <Route path="/nosotros" element={<Nosotros />} />
+        <Route path="/contacto" element={<Contacto />} />
         <Route path="/login-paciente" element={<LoginPaciente />} />
         <Route path="/login-medico" element={<LoginMedico />} />
         <Route path="/dashboard-paciente" element={<DashboardPaciente />} />

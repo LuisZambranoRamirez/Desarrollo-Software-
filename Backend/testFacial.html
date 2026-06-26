@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Login Facial - Clínica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 320px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 10px 0 6px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cfd6dd;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 6px 6px 6px 0;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #d97706;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #4b5563;
+            color: white;
+        }
+
+        video, canvas, img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 12px;
+            background: #111;
+            border: 1px solid #d1d5db;
+        }
+
+        .preview-box {
+            margin-top: 12px;
+        }
+
+        .status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        .challenge-box {
+            padding: 12px;
+            background: #ecfeff;
+            border: 1px solid #a5f3fc;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        .frames-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .small {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .success {
+            background: #ecfdf5;
+            border: 1px solid #86efac;
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+        }
+
+        .warning {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Prueba de Reconocimiento Facial - Clínica</h1>
+    <p class="small">
+        Este HTML prueba los endpoints del backend facial:
+        <br>
+        <strong>POST /api/facial/register</strong>,
+        <strong>POST /api/face-auth/start</strong>,
+        <strong>POST /api/face-auth/verify</strong>
+    </p>
+
+    <!-- CONFIG -->
+    <div class="card">
+        <h2>Configuración</h2>
+        <label for="apiBase">Base URL del backend</label>
+        <input type="text" id="apiBase" value="http://localhost:8000/api">
+        <p class="small">Si tu backend corre en otra IP/puerto, cámbialo aquí.</p>
+    </div>
+
+    <!-- CAMARA -->
+    <div class="card">
+        <h2>Cámara</h2>
+        <div class="row">
+            <div class="col">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+
+                <div style="margin-top: 12px;">
+                    <button class="btn-primary" onclick="startCamera()">Abrir cámara</button>
+                    <button class="btn-danger" onclick="stopCamera()">Cerrar cámara</button>
+                </div>
+            </div>
+
+            <div class="col">
+                <h3>Vista previa de captura</h3>
+                <img id="snapshotPreview" alt="Vista previa de captura">
+                <div class="frames-info" id="framesInfo">Frames capturados: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTRO FACIAL -->
+    <div class="card">
+        <h2>1) Registro facial</h2>
+        <p class="small">
+            Usa esta sección para registrar el embedding facial de un usuario existente en tu tabla <strong>usuarios</strong>.
+        </p>
+
+        <label for="usuarioIdRegister">ID del usuario</label>
+        <input type="number" id="usuarioIdRegister" placeholder="Ejemplo: 2">
+
+        <div style="margin-top: 12px;">
+            <button class="btn-success" onclick="captureRegisterPhoto()">Tomar foto para registro</button>
+            <button class="btn-primary" onclick="registerFace()">Enviar al endpoint /facial/register</button>
+        </div>
+
+        <div id="registerStatus" class="status">Aún no se ha realizado el registro facial.</div>
+    </div>
+
+    <!-- LOGIN FACIAL -->
+    <div class="card">
+        <h2>2) Login facial</h2>
+        <p class="small">
+            Este flujo:
+            <br>1. Llama a <strong>/face-auth/start</strong>
+            <br>2. Muestra el challenge
+            <br>3. Captura varios frames
+            <br>4. Envía los frames a <strong>/face-auth/verify</strong>
+        </p>
+
+        <div style="margin-bottom: 10px;">
+            <button class="btn-warning" onclick="startFaceAuth()">Iniciar autenticación facial</button>
+            <button class="btn-secondary" onclick="captureFramesOnly()">Capturar 5 frames manualmente</button>
+            <button class="btn-primary" onclick="verifyFaceAuth()">Enviar frames a /face-auth/verify</button>
+        </div>
+
+        <div class="challenge-box" id="challengeBox">
+            Challenge: aún no iniciado
+        </div>
+
+        <div id="loginStatus" class="status">Aún no se ha realizado la autenticación facial.</div>
+    </div>
+</div>
+
+<script>
+    // =========================================================
+    // CONFIGURACIÓN GLOBAL
+    // =========================================================
+    let stream = null;
+    let capturedRegisterImage = null;
+    let capturedFrames = [];
+    let currentSessionToken = null;
+    let currentChallengeType = null;
+
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const snapshotPreview = document.getElementById("snapshotPreview");
+    const framesInfo = document.getElementById("framesInfo");
+
+    function getApiBase() {
+        return document.getElementById("apiBase").value.trim();
+    }
+
+    function setStatus(elementId, message, type = "normal") {
+        const el = document.getElementById(elementId);
+        el.className = "status";
+        if (type === "success") el.classList.add("success");
+        if (type === "error") el.classList.add("error");
+        if (type === "warning") el.classList.add("warning");
+        el.textContent = message;
+    }
+
+    function updateFramesInfo() {
+        framesInfo.textContent = `Frames capturados: ${capturedFrames.length}`;
+    }
+
+    // =========================================================
+    // CÁMARA
+    // =========================================================
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: false
+            });
+
+            video.srcObject = stream;
+            setStatus("registerStatus", "Cámara abierta correctamente.", "success");
+        } catch (error) {
+            console.error(error);
+            setStatus("registerStatus", "No se pudo abrir la cámara: " + error.message, "error");
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            stream = null;
+        }
+        setStatus("registerStatus", "Cámara cerrada.", "warning");
+    }
+
+    function captureImageFromVideo() {
+        if (!video.videoWidth || !video.videoHeight) {
+            throw new Error("La cámara aún no está lista o no hay video disponible.");
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // calidad 0.9 para mejor precisión facial
+        return canvas.toDataURL("image/jpeg", 0.9);
+    }
+
+    // =========================================================
+    // REGISTRO FACIAL
+    // =========================================================
+    function captureRegisterPhoto() {
+        try {
+            const imageBase64 = captureImageFromVideo();
+            capturedRegisterImage = imageBase64;
+            snapshotPreview.src = imageBase64;
+            setStatus("registerStatus", "Foto de registro capturada correctamente.", "success");
+        } catch (error) {
+            setStatus("registerStatus", error.message, "error");
+        }
+    }
+
+    async function registerFace() {
+        try {
+            const token = localStorage.getItem("token")
+            const usuarioId = parseInt(document.getElementById("usuarioIdRegister").value);
+
+            if (!usuarioId) {
+                setStatus("registerStatus", "Debes ingresar un ID de usuario válido.", "error");
+                return;
+            }
+
+            if (!capturedRegisterImage) {
+                setStatus("registerStatus", "Primero debes capturar una foto para el registro.", "error");
+                return;
+            }
+
+            setStatus("registerStatus", "Registrando rostro en el backend...", "warning");
+
+            const response = await fetch(`${getApiBase()}/facial/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    imageBase64: capturedRegisterImage
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Error al registrar el rostro.");
+            }
+
+            setStatus(
+                "registerStatus",
+                `Registro facial exitoso.\nUsuario ID: ${data.usuarioId}\nMensaje: ${data.message}`,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            setStatus("registerStatus", "Error en registro facial: " + error.message, "error");
+        }
+    }
+
+    // =========================================================
+    // AUTENTICACIÓN FACIAL
+    // =========================================================
+    async function startFaceAuth() {
+        try {
+            setStatus("loginStatus", "Iniciando sesión facial...", "warning");
+
+            const response = await fetch(`${getApiBase()}/face-auth/start`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Error al iniciar autenticación facial.");
+            }
+
+            currentSessionToken = data.sessionToken;
+            currentChallengeType = data.challengeType;
+            capturedFrames = [];
+            updateFramesInfo();
+
+            document.getElementById("challengeBox").textContent =
+                `Challenge: ${data.challengeType} | ${data.message}`;
+
+            setStatus(
+                "loginStatus",
+                `Sesión facial iniciada correctamente.\nSessionToken: ${data.sessionToken}\nChallenge: ${data.challengeType}\nAhora puedes capturar los frames.`,
+                "success"
+            );
+
+            // Si quieres, puedes capturar automáticamente aquí:
+            await captureFrames(5, 300);
+
+        } catch (error) {
+            console.error(error);
+            setStatus("loginStatus", "Error al iniciar autenticación facial: " + error.message, "error");
+        }
+    }
+
+    async function captureFramesOnly() {
+        try {
+            capturedFrames = [];
+            updateFramesInfo();
+            await captureFrames(5, 300);
+            setStatus("loginStatus", "Frames capturados manualmente.", "success");
+        } catch (error) {
+            setStatus("loginStatus", "Error al capturar frames: " + error.message, "error");
+        }
+    }
+
+    async function captureFrames(totalFrames = 5, delayMs = 300) {
+        if (!stream) {
+            throw new Error("Primero debes abrir la cámara.");
+        }
+
+        for (let i = 0; i < totalFrames; i++) {
+            const imageBase64 = captureImageFromVideo();
+            const timestamp = Date.now();
+
+            capturedFrames.push({
+                imageBase64,
+                timestamp
+            });
+
+            snapshotPreview.src = imageBase64;
+            updateFramesInfo();
+
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+    }
+
+    async function verifyFaceAuth() {
+        try {
+            if (!currentSessionToken) {
+                setStatus("loginStatus", "Primero debes iniciar la autenticación facial.", "error");
+                return;
+            }
+
+            if (!capturedFrames || capturedFrames.length === 0) {
+                setStatus("loginStatus", "No hay frames capturados para enviar.", "error");
+                return;
+            }
+
+            setStatus("loginStatus", "Enviando frames al backend para validación...", "warning");
+
+            const response = await fetch(`${getApiBase()}/face-auth/verify`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    sessionToken: currentSessionToken,
+                    frames: capturedFrames
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Error al verificar autenticación facial.");
+            }
+
+            if (data.authenticated) {
+                console.log(data)
+                localStorage.setItem("token", data.accessToken)
+                setStatus(
+                    "loginStatus",
+                    `AUTENTICACIÓN EXITOSA\n\n` +
+                    `Usuario ID: ${data.userId}\n` +
+                    `Nombre: ${data.fullName}\n` +
+                    `Rol: ${data.role}\n` +
+                    `token: ${data.accessToken}\n`+
+                    `Mensaje: ${data.message}`,
+                    "success"
+
+                );
+            } else {
+                setStatus(
+                    "loginStatus",
+                    `AUTENTICACIÓN FALLIDA\n\nMensaje: ${data.message}`,
+                    "error"
+                );
+            }
+
+        } catch (error) {
+            console.error(error);
+            setStatus("loginStatus", "Error en verificación facial: " + error.message, "error");
+        }
+    }
+</script>
+</body>
+</html>

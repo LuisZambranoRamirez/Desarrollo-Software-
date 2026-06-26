@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, CheckConstraint
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, CheckConstraint, TIMESTAMP
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from config.database import Base
 
 class Usuario(Base):
@@ -15,6 +16,12 @@ class Usuario(Base):
     activo = Column(Boolean, default=True)
     fecha_creacion = Column(DateTime, default=func.now())
     ultimo_acceso = Column(DateTime, nullable=True)
+
+    login_facial_habilitado = Column(Boolean, default=False)
+    ultimo_login_facial = Column(TIMESTAMP, nullable=True)
+
+    perfil_facial = relationship("PerfilFacial", back_populates="usuario", uselist=False)
+
 
     __table_args__ = (
         CheckConstraint("rol IN ('admin', 'doctor', 'recepcionista', 'paciente')", name="usuarios_rol_check"),

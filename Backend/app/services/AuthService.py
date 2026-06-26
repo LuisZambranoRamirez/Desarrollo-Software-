@@ -3,24 +3,50 @@ from models.Usuario import Usuario
 from schemas.Auth import LoginRequest
 from fastapi import HTTPException, status
 from datetime import datetime
-from security.Hashing import verificar_password
+from security.security import verify_password, create_access_token
+from schemas.Auth import TokenResponse, UserTokenData
 
-def login_user(db: Session, credentials: LoginRequest):
-    usuario = db.query(Usuario).filter(Usuario.email == credentials.email).first()
-    if not usuario:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas")
-    
-    if not verificar_password(credentials.password, usuario.password_hash): 
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas")
-    
-    if not usuario.activo:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usuario inactivo")
+class AuthService:
 
-    usuario.ultimo_acceso = datetime.now()
-    db.commit()
+    @staticmethod
+    def login(db: Session, email: str, password: str) -> TokenResponse:
+        usuario = db.query(Usuario).filter(Usuario.email == email).first()
 
-    return {
-        "access_token": f"token_simulado_para_{usuario.id}",
-        "token_type": "bearer",
-        "rol": usuario.rol
-    }
+        if not usuario:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales inválidas."
+            )
+
+        if not usuario.activo:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="El usuario está inactivo."
+            )
+
+        if not verify_password(password, usuario.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales inválidas."
+            )
+
+        token_payload = {
+            "sub": str(usuario.id),
+            "email": usuario.email,
+            "rol": usuario.rol,
+            "nombre": usuario.nombre,
+            "apellido": usuario.apellido
+        }
+
+        access_token = create_access_token(token_payload)
+
+        return TokenResponse(
+            accessToken=access_token,
+            user=UserTokenData(
+                id=usuario.id,
+                email=usuario.email,
+                nombre=usuario.nombre,
+                apellido=usuario.apellido,
+                rol=usuario.rol
+            )
+        )

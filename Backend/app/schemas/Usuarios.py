@@ -8,6 +8,7 @@ class UsuarioBase(BaseModel):
     apellido: str
     telefono: Optional[str] = None
     rol: str
+    login_facial_habilitado: bool
 
 class UsuarioCreate(UsuarioBase):
     password: str

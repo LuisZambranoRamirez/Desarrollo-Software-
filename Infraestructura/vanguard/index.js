@@ -46,7 +46,7 @@ ami.on("BridgeEnter", (event) => {
   console.log(event)
   console.log("-------------------------------------------------")
 
-  try {
+  /*try {
   const response = fetch(EVENTOS_URL, {
       method: "POST",
       headers: {
@@ -62,7 +62,7 @@ ami.on("BridgeEnter", (event) => {
 
   } catch (err) {
     console.error("Error:", err.message);
-  }
+  }*/
 });
 
 ami.on("Hangup", async (event) => {
@@ -70,7 +70,7 @@ ami.on("Hangup", async (event) => {
   console.log(event);
   console.log("-------------------------------------------------");
 
-  try {
+  /*try {
     const response = fetch(EVENTOS_URL, {
       method: "POST",
       headers: {
@@ -84,7 +84,7 @@ ami.on("Hangup", async (event) => {
 
   } catch (err) {
     console.error("Error:", err.message);
-  }
+  }*/
 });
 
 // --- Errores ---

@@ -89,6 +89,8 @@ La aplicacion se abrira en `http://localhost:5173`.
 | Paciente | jorge.silva@gmail.com | Paciente2025* |
 | Paciente | maria.luna@gmail.com | Paciente2025* |
 
+> El medico Oscar Quizpe tiene cedula profesional: **42342342**
+
 ## Flujo de uso
 
 ### Recepcionista

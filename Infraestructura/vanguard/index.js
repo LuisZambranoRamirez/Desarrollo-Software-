@@ -35,6 +35,11 @@ ami.on("BridgeCreate", (event) => {
   console.log("-------------------------------------------------")
 });
 
+ami.on("BridgeEnter", (event) => {
+  console.log("🔗 Llamada conectada:", event.Channel1, "<->", event.Channel2);
+  console.log(event)
+  console.log("-------------------------------------------------")
+});
 
 ami.on("Hangup", (event) => {
   console.log("📴 Hangup:", event.Channel, "Cause:", event.Cause);

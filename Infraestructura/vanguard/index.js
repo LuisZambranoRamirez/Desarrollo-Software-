@@ -47,7 +47,7 @@ ami.on("BridgeEnter", (event) => {
   console.log("-------------------------------------------------")
 
   try {
-  const response = await fetch(EVENTOS_URL, {
+  const response = fetch(EVENTOS_URL, {
       method: "POST",
       headers: {
       "Content-Type": "application/json"
@@ -60,7 +60,6 @@ ami.on("BridgeEnter", (event) => {
       })
   });
 
-    console.log("Estado:", response.status);
   } catch (err) {
     console.error("Error:", err.message);
   }
@@ -72,7 +71,7 @@ ami.on("Hangup", async (event) => {
   console.log("-------------------------------------------------");
 
   try {
-    const response = await fetch(EVENTOS_URL, {
+    const response = fetch(EVENTOS_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -83,7 +82,6 @@ ami.on("Hangup", async (event) => {
       })
     });
 
-    console.log("Estado:", response.status);
   } catch (err) {
     console.error("Error:", err.message);
   }

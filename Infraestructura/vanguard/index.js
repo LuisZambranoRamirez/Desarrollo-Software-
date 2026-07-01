@@ -29,6 +29,13 @@ ami.on("Newchannel", (event) => {
   console.log("-------------------------------------------------")
 });
 
+ami.on("Bridge", (event) => {
+  console.log("🔗 Llamada conectada:", event.Channel1, "<->", event.Channel2);
+  console.log(event)
+  console.log("-------------------------------------------------")
+});
+
+
 ami.on("Hangup", (event) => {
   console.log("📴 Hangup:", event.Channel, "Cause:", event.Cause);
     console.log(event)

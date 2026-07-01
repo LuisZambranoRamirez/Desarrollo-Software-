@@ -29,9 +29,7 @@ class AmiEventListener extends EventEmitter {
       this.startKeepAlive();
     });
 
-    this.socket.on("data", (data) => { 
-        console.log(data.toString());
-        this.onData(data)});
+    this.socket.on("data", (data) => this.onData(data));
     this.socket.on("close", () => this.onDisconnect());
     this.socket.on("error", (err) => this.emit("error", err));
   }

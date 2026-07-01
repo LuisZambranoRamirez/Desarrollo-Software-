@@ -10,7 +10,7 @@ class PacienteCreate(BaseModel):
     direccion: Optional[str] = None
     alergias: Optional[str] = None
 
-class PacienteResponse(BaseModel):
+class PacienteDataResponse(BaseModel):
     id: int
     usuario: UsuarioResponse
     fecha_nacimiento: Optional[date]
@@ -20,3 +20,21 @@ class PacienteResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class PacienteResponse(BaseModel):
+    message: str
+    accessToken: str
+    tokenType: str
+    paciente: PacienteDataResponse
+
+    class Config:
+        from_attributes = True
+
+
+class BuscarPacienteResponse(BaseModel):
+    id: int
+    usuario: UsuarioResponse
+    fecha_nacimiento: Optional[date]
+    genero: Optional[str]
+    direccion: Optional[str]
+    alergias: Optional[str]

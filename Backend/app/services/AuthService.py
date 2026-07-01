@@ -17,19 +17,16 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Credenciales inválidas."
             )
-
         if not usuario.activo:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="El usuario está inactivo."
             )
-
         if not verify_password(password, usuario.password_hash):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Credenciales inválidas."
             )
-
         token_payload = {
             "sub": str(usuario.id),
             "email": usuario.email,

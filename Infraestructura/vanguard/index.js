@@ -1,10 +1,10 @@
 const AmiEventListener = require("./AmiEventListener");
 
 const ami = new AmiEventListener({
-  host: "127.0.0.1",      // IP de tu FreePBX/Asterisk
+  host: "127.0.0.1",      
   port: 5038,
-  username: "miusuario",
-  secret: "miPasswordFuerte",
+  username: "orus",
+  secret: "drakotako1234",
   reconnectDelay: 5000,
   keepAliveInterval: 15000,
 });

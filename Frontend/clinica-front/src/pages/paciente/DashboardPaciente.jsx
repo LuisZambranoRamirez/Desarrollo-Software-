@@ -4,6 +4,7 @@ import { patientData, appointments } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar';
 import AppointmentCard from '../../components/cards/AppointmentCard';
 import Card from '../../components/ui/Card';
+import RealtimeStatus from '../../components/common/RealtimeStatus.jsx';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard-paciente' },
@@ -30,9 +31,12 @@ function DashboardPaciente() {
     <div className="flex min-h-screen bg-[#F8FAFC]">
       <Sidebar menuItems={menuItems} userRole="Paciente" userName={patientData.name} />
       <div className="flex-1 md:ml-64 p-6 md:p-8">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]">Bienvenido, {patientData.name}</h1>
-          <p className="text-[#6B7280] mt-1 capitalize">{dateStr}</p>
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]">Bienvenido, {patientData.name}</h1>
+            <p className="text-[#6B7280] mt-1 capitalize">{dateStr}</p>
+          </div>
+          <RealtimeStatus />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {stats.map((stat, i) => (

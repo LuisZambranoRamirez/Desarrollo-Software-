@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles 
 from config.database import engine, Base
-from routers import AuthRoute, MedicoRoute, PacienteRoute, FacialRoute
+from routers import AuthRoute, MedicoRoute, PacienteRoute, FacialRoute, WebSocketRoute
 
 # Crear las tablas en la BD si no existen (en producción se recomienda usar Alembic)
 Base.metadata.create_all(bind=engine)
@@ -26,6 +26,7 @@ app.include_router(AuthRoute.router)
 app.include_router(MedicoRoute.router)
 app.include_router(PacienteRoute.router)
 app.include_router(FacialRoute.router)
+app.include_router(WebSocketRoute.router)
 @app.get("/")
 def read_root():
     return {"message": "Bienvenido a la API de la Clínica Biométrica Facial"}

@@ -2,6 +2,7 @@ import { doctorDashboardData } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Table from '../../components/ui/Table.jsx';
+import RealtimeStatus from '../../components/common/RealtimeStatus.jsx';
 import { LayoutDashboard, Calendar, Users, ClipboardList, MessageSquare, BarChart3, User, Bell, Clock, AlertCircle, ChevronRight, Heart } from 'lucide-react';
 
 const menuItems = [
@@ -39,10 +40,13 @@ function DashboardMedico() {
             <h1 className="text-2xl font-bold text-gray-900">Dashboard Médico</h1>
             <p className="text-gray-500 text-sm mt-1 capitalize">{today}</p>
           </div>
-          <button className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
-            <Bell size={22} className="text-gray-500" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          <div className="flex items-center gap-3">
+            <RealtimeStatus />
+            <button className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
+              <Bell size={22} className="text-gray-500" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

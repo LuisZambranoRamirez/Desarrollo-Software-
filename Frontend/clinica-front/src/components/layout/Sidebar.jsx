@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut, Menu, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 function Sidebar({ menuItems, userRole, userName }) {
   const [collapsed, setCollapsed] = useState(false);
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   return (
     <>
@@ -67,7 +69,7 @@ function Sidebar({ menuItems, userRole, userName }) {
 
         <div className="p-4 border-t border-gray-200">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => { logout(); navigate('/'); }}
             className="flex items-center space-x-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
           >
             <LogOut size={20} />

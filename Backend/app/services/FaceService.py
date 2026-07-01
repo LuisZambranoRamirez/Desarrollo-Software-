@@ -10,7 +10,7 @@ from security.security import create_access_token
 
 class FaceService:
 
-    MATCH_THRESHOLD = 0.45   # puedes ajustar 0.40 - 0.55
+    MATCH_THRESHOLD = 0.35
 
     @staticmethod
     def register_face(db: Session, usuario_id: int, image_base64: str):
@@ -160,7 +160,7 @@ class FaceService:
             "accessToken": access_token,
             "tokenType": "bearer",
             "userId": usuario.id,
-            "fullName": usuario.nombre+usuario.apellido,
+            "fullName": f"{usuario.nombre} {usuario.apellido}",
             "role": usuario.rol
             #"user": {
             #    "id": usuario.id,
@@ -186,7 +186,9 @@ class FaceService:
         return {
             "authenticated": False,
             "message": "No hubo coincidencia facial válida.",
-            "accessToken": None,
-            "tokenType": None,
-            "user": None
+            "accessToken": "",
+            "tokenType": "bearer",
+            "userId": None,
+            "fullName": None,
+            "role": None
         }

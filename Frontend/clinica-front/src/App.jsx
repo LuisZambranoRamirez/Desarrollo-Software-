@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import Home from './pages/public/Home';
 import Especialidades from './pages/public/Especialidades';
 import Nosotros from './pages/public/Nosotros';
@@ -29,6 +30,7 @@ import ConfiguracionCallCenter from './pages/callcenter/ConfiguracionCallCenter'
 function App() {
   return (
     <BrowserRouter>
+      <AuthProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/especialidades" element={<Especialidades />} />
@@ -57,6 +59,7 @@ function App() {
         <Route path="/dashboard-callcenter/reportes" element={<ReportesCallCenter />} />
         <Route path="/dashboard-callcenter/configuracion" element={<ConfiguracionCallCenter />} />
       </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

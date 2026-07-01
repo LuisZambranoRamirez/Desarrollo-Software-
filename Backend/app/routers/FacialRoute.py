@@ -6,7 +6,7 @@ from schemas.RegistroFacial import FacialRegisterRequest, FacialRegisterResponse
 from schemas.StartAuth import FaceAuthStartResponse
 from schemas.VerifyAuth import FaceAuthVerifyRequest, FaceAuthVerifyResponse
 from services.FaceService import FaceService
-from dependencies.RoleDependency import get_current_user
+from dependencies.AuthDependency import get_current_user
 from models.Usuario import Usuario
 
 router = APIRouter(prefix="/api", tags=["Facial Auth"])

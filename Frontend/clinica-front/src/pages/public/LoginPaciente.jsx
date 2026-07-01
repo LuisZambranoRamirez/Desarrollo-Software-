@@ -1,14 +1,44 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, HeartPulse } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 function LoginPaciente() {
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+  const { login } = useAuth();
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm((current) => ({
+      ...current,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/dashboard-paciente');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const user = await login(form);
+
+      if (user.rol !== 'paciente') {
+        setError('Esta cuenta no pertenece a un paciente.');
+        return;
+      }
+
+      navigate('/dashboard-paciente');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -19,21 +49,34 @@ function LoginPaciente() {
             <div className="w-full max-w-md">
               <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
                 <h2 className="text-2xl font-bold text-[#1F2937] text-center mb-8">
-                  Iniciar Sesión - Paciente
+                  Iniciar sesion - Paciente
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <Input
                     label="Correo"
+                    name="email"
                     type="email"
                     placeholder="paciente@correo.com"
                     icon={Mail}
+                    value={form.email}
+                    onChange={handleChange}
+                    required
                   />
                   <Input
-                    label="Contraseña"
+                    label="Contrasena"
+                    name="password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="********"
                     icon={Lock}
+                    value={form.password}
+                    onChange={handleChange}
+                    required
                   />
+                  {error && (
+                    <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+                      {error}
+                    </p>
+                  )}
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-sm text-[#4B5563]">
                       <input
@@ -43,23 +86,23 @@ function LoginPaciente() {
                       Recordarme
                     </label>
                     <a href="#" className="text-sm text-[#2563EB] hover:underline">
-                      ¿Olvidaste tu contraseña?
+                      Olvidaste tu contrasena?
                     </a>
                   </div>
-                  <Button type="submit" variant="primary" size="lg" className="w-full">
-                    Iniciar Sesión
+                  <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Ingresando...' : 'Iniciar sesion'}
                   </Button>
                 </form>
                 <p className="text-center text-sm text-[#6B7280] mt-6">
-                  ¿No tienes cuenta?{' '}
+                  No tienes cuenta?{' '}
                   <a href="#" className="text-[#2563EB] hover:underline font-medium">
                     Crear cuenta
                   </a>
                 </p>
                 <div className="text-center mt-4 pt-4 border-t border-gray-100">
-                  <span className="text-sm text-[#6B7280]">¿Eres médico? </span>
+                  <span className="text-sm text-[#6B7280]">Eres medico? </span>
                   <button type="button" onClick={() => navigate('/login-medico')} className="text-sm text-[#2563EB] hover:underline font-medium">
-                    Ingresa aquí
+                    Ingresa aqui
                   </button>
                 </div>
               </div>

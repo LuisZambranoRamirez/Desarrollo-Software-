@@ -47,3 +47,12 @@ def buscar_paciente_por_telefono(db: Session, telefono: str):
         )
     
     return resultado
+
+
+def listar_pacientes(db: Session):
+    return (
+        db.query(Paciente)
+        .options(joinedload(Paciente.usuario))
+        .filter(Paciente.activo == True)
+        .all()
+    )

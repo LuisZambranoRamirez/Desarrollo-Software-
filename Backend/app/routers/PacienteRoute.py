@@ -2,9 +2,14 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from config.database import get_db
 from schemas.Pacientes import PacienteCreate, PacienteResponse
-from services.PcienteService import registrar_paciente, buscar_paciente_por_telefono
+from services.PcienteService import registrar_paciente, buscar_paciente_por_telefono, listar_pacientes
 
 router = APIRouter(prefix="/pacientes", tags=["Pacientes"])
+
+@router.get("/", response_model=list[PacienteResponse])
+def obtener_pacientes(db: Session = Depends(get_db)):
+    return listar_pacientes(db)
+
 
 @router.post("/", response_model=PacienteResponse, status_code=status.HTTP_201_CREATED)
 def crear_paciente(paciente: PacienteCreate, db: Session = Depends(get_db)):

@@ -1,22 +1,64 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { doctors } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import Card from '../../components/ui/Card.jsx';
 import { LayoutDashboard, Phone, Users, Calendar, Stethoscope, BarChart3, Settings, Search } from 'lucide-react';
+import { api } from '../../services/api.js';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard-callcenter' },
   { icon: Phone, label: 'Central de llamadas', path: '/dashboard-callcenter/llamadas' },
   { icon: Users, label: 'Pacientes', path: '/dashboard-callcenter/pacientes' },
   { icon: Calendar, label: 'Citas', path: '/dashboard-callcenter/citas' },
-  { icon: Stethoscope, label: 'Médicos', path: '/dashboard-callcenter/medicos' },
+  { icon: Stethoscope, label: 'Medicos', path: '/dashboard-callcenter/medicos' },
   { icon: BarChart3, label: 'Reportes', path: '/dashboard-callcenter/reportes' },
-  { icon: Settings, label: 'Configuración', path: '/dashboard-callcenter/configuracion' },
+  { icon: Settings, label: 'Configuracion', path: '/dashboard-callcenter/configuracion' },
 ];
+
+function mapDoctor(doctor) {
+  const name = `${doctor.usuario.nombre} ${doctor.usuario.apellido}`;
+
+  return {
+    id: doctor.id,
+    name,
+    specialty: doctor.especialidad_id ? `Especialidad ${doctor.especialidad_id}` : 'Sin especialidad',
+    experience: doctor['a\u00c3\u00b1os_experiencia'] ?? doctor['a\u00f1os_experiencia'] ?? 0,
+    photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563EB&color=fff&size=200`,
+  };
+}
 
 function MedicosCallCenter() {
   const [search, setSearch] = useState('');
-  const filtered = doctors.filter((d) =>
+  const [doctorList, setDoctorList] = useState(doctors);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    api.getDoctores()
+      .then((data) => {
+        if (!isMounted) return;
+        setDoctorList(data.map(mapDoctor));
+        setError('');
+      })
+      .catch((err) => {
+        if (isMounted) {
+          setError(err.message);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filtered = doctorList.filter((d) =>
     d.name.toLowerCase().includes(search.toLowerCase()) ||
     d.specialty.toLowerCase().includes(search.toLowerCase())
   );
@@ -26,8 +68,15 @@ function MedicosCallCenter() {
       <Sidebar menuItems={menuItems} userRole="Call Center" userName="Laura Mendoza" />
       <div className="flex-1 p-6 md:p-8 md:ml-64">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Directorio Médico</h1>
-          <p className="text-gray-500 text-sm mt-1">Directorio de médicos disponibles</p>
+          <h1 className="text-2xl font-bold text-gray-900">Directorio Medico</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {isLoading ? 'Cargando medicos desde el backend...' : 'Directorio de medicos disponibles'}
+          </p>
+          {error && (
+            <p className="mt-2 text-sm text-amber-700">
+              No se pudo cargar el backend. Mostrando datos de prueba. Detalle: {error}
+            </p>
+          )}
         </div>
 
         <div className="relative max-w-md mb-6">
@@ -53,13 +102,13 @@ function MedicosCallCenter() {
                 <div>
                   <h3 className="font-semibold text-gray-900">{doc.name}</h3>
                   <p className="text-sm text-gray-500">{doc.specialty}</p>
-                  <p className="text-xs text-gray-400">{doc.experience} años de experiencia</p>
+                  <p className="text-xs text-gray-400">{doc.experience} anos de experiencia</p>
                 </div>
               </div>
             </Card>
           ))}
           {filtered.length === 0 && (
-            <p className="text-gray-400 col-span-full text-center py-8">No se encontraron médicos</p>
+            <p className="text-gray-400 col-span-full text-center py-8">No se encontraron medicos</p>
           )}
         </div>
       </div>

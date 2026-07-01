@@ -29,7 +29,7 @@ ami.on("Newchannel", (event) => {
   console.log("-------------------------------------------------")
 });
 
-ami.on("Bridge", (event) => {
+ami.on("BridgeCreate", (event) => {
   console.log("🔗 Llamada conectada:", event.Channel1, "<->", event.Channel2);
   console.log(event)
   console.log("-------------------------------------------------")

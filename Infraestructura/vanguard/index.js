@@ -11,45 +11,45 @@ const ami = new AmiEventListener({
 
 // --- Eventos de conexión ---
 ami.on("connected", () => {
-  console.log("✅ Conectado a AMI");
+  console.log("Conectado a AMI");
 });
 
 ami.on("disconnected", () => {
-  console.log("⚠️ Desconectado de AMI");
+  console.log("Desconectado de AMI");
 });
 
 ami.on("reconnecting", () => {
-  console.log("♻️ Reconectando...");
+  console.log("Reconectando...");
 });
 
 // --- Eventos telefónicos típicos ---
 ami.on("Newchannel", (event) => {
-  console.log("📞 Nueva llamada:", event.Channel, event.CallerIDNum);
+  console.log("Nueva llamada:", event.Channel, event.CallerIDNum);
   console.log(event)
   console.log("-------------------------------------------------")
 });
 
 ami.on("BridgeCreate", (event) => {
-  console.log("🔗 Llamada entrante:", event.Channel1, "<->", event.Channel2);
+  console.log("Llamada entrante:", event.Channel1, "<->", event.Channel2);
   console.log(event)
   console.log("-------------------------------------------------")
 });
 
 ami.on("BridgeEnter", (event) => {
-  console.log("🔗 Llamada conectada:", event.Channel1, "<->", event.Channel2);
+  console.log("Llamada conectada:", event.Channel1, "<->", event.Channel2);
   console.log(event)
   console.log("-------------------------------------------------")
 });
 
 ami.on("Hangup", (event) => {
-  console.log("📴 Hangup:", event.Channel, "Cause:", event.Cause);
+  console.log("Hangup:", event.Channel, "Cause:", event.Cause);
     console.log(event)
   console.log("-------------------------------------------------")
 });
 
 // --- Errores ---
 ami.on("error", (err) => {
-  console.error("❌ Error AMI:", err.message);
+  console.error("Error AMI:", err.message);
 });
 
 // Iniciar conexión

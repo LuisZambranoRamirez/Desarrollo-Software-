@@ -3,9 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles 
 from config.database import engine, Base
 from routers import AuthRoute, MedicoRoute, PacienteRoute, FacialRoute, WebSocketRoute
+from seed import run_seed
 
 # Crear las tablas en la BD si no existen (en producción se recomienda usar Alembic)
 Base.metadata.create_all(bind=engine)
+
+# Si la BD está vacía, insertar datos iniciales automáticamente
+run_seed()
 
 app = FastAPI(
     title="API REST Clínica Biométrica Facial",

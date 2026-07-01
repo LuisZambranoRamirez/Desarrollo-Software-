@@ -1,8 +1,11 @@
+import { useState, useEffect } from 'react';
 import { doctorDashboardData } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Table from '../../components/ui/Table.jsx';
 import RealtimeStatus from '../../components/common/RealtimeStatus.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { api } from '../../services/api.js';
 import { LayoutDashboard, Calendar, Users, ClipboardList, MessageSquare, BarChart3, User, Bell, Clock, AlertCircle, ChevronRight, Heart } from 'lucide-react';
 
 const menuItems = [
@@ -17,23 +20,55 @@ const menuItems = [
 
 const today = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-const stats = [
-  { label: 'Pacientes del día', value: doctorDashboardData.patientsToday, icon: Users, bg: 'bg-blue-100', iconBg: 'bg-[#2563EB]', textColor: 'text-[#2563EB]' },
-  { label: 'Próximas consultas', value: doctorDashboardData.upcomingConsultations.length, icon: Clock, bg: 'bg-green-100', iconBg: 'bg-[#10B981]', textColor: 'text-[#10B981]' },
-  { label: 'Citas pendientes', value: doctorDashboardData.pendingAppointments, icon: AlertCircle, bg: 'bg-yellow-100', iconBg: 'bg-[#F59E0B]', textColor: 'text-[#F59E0B]' },
-  { label: 'Total pacientes', value: doctorDashboardData.statistics.totalPatients, icon: Heart, bg: 'bg-purple-100', iconBg: 'bg-[#8B5CF6]', textColor: 'text-[#8B5CF6]' },
-];
-
-const patientColumns = [
-  { key: 'name', label: 'Paciente' },
-  { key: 'age', label: 'Edad' },
-  { key: 'condition', label: 'Condición' },
-];
-
 function DashboardMedico() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [realPatients, setRealPatients] = useState([]);
+
+  useEffect(() => {
+    api.getMe().then(setProfile).catch(() => {});
+    api.getPacientes().then(setRealPatients).catch(() => {});
+  }, []);
+
+  const displayName = profile
+    ? `Dr. ${profile.nombre} ${profile.apellido}`
+    : user
+      ? `Dr. ${user.nombre} ${user.apellido}`
+      : 'Dr. Carlos Mendoza';
+
+  const patientsToday = realPatients.length > 0 ? realPatients.length : doctorDashboardData.patientsToday;
+  const totalPatients = realPatients.length > 0 ? realPatients.length : doctorDashboardData.statistics.totalPatients;
+
+  const stats = [
+    { label: 'Pacientes del día', value: patientsToday, icon: Users, bg: 'bg-blue-100', iconBg: 'bg-[#2563EB]', textColor: 'text-[#2563EB]' },
+    { label: 'Próximas consultas', value: doctorDashboardData.upcomingConsultations.length, icon: Clock, bg: 'bg-green-100', iconBg: 'bg-[#10B981]', textColor: 'text-[#10B981]' },
+    { label: 'Citas pendientes', value: doctorDashboardData.pendingAppointments, icon: AlertCircle, bg: 'bg-yellow-100', iconBg: 'bg-[#F59E0B]', textColor: 'text-[#F59E0B]' },
+    { label: 'Total pacientes', value: totalPatients, icon: Heart, bg: 'bg-purple-100', iconBg: 'bg-[#8B5CF6]', textColor: 'text-[#8B5CF6]' },
+  ];
+
+  const patientColumns = [
+    { key: 'nombre', label: 'Paciente' },
+    { key: 'telefono', label: 'Teléfono' },
+    { key: 'email', label: 'Email' },
+  ];
+
+  const patientsData = realPatients.length > 0
+    ? realPatients.map(p => ({
+        id: p.id,
+        nombre: `${p.usuario.nombre} ${p.usuario.apellido}`,
+        telefono: p.usuario.telefono || '',
+        email: p.usuario.email,
+      }))
+    : doctorDashboardData.patients.map(p => ({
+        id: p.id,
+        nombre: p.name,
+        telefono: '',
+        email: '',
+      }));
+
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <Sidebar menuItems={menuItems} userRole="Médico" userName="Dr. Carlos Mendoza" />
+      <Sidebar menuItems={menuItems} userRole="Médico" userName={displayName} />
       <div className="flex-1 p-6 md:p-8 md:ml-64">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -100,7 +135,7 @@ function DashboardMedico() {
             </div>
             <Table
               columns={patientColumns}
-              data={doctorDashboardData.patients.slice(0, 4)}
+              data={patientsData.slice(0, 4)}
             />
           </Card>
         </div>

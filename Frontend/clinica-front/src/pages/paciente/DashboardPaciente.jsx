@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LayoutDashboard, Calendar, ClipboardList, FlaskConical, User, Settings, Bell, ChevronRight, Activity, Heart } from 'lucide-react';
 import { patientData, appointments } from '../../data/mockData';
@@ -5,6 +6,8 @@ import Sidebar from '../../components/layout/Sidebar';
 import AppointmentCard from '../../components/cards/AppointmentCard';
 import Card from '../../components/ui/Card';
 import RealtimeStatus from '../../components/common/RealtimeStatus.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { api } from '../../services/api.js';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard-paciente' },
@@ -16,6 +19,19 @@ const menuItems = [
 ];
 
 function DashboardPaciente() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    api.getMe().then(setProfile).catch(() => {});
+  }, []);
+
+  const displayName = profile
+    ? `${profile.nombre} ${profile.apellido}`
+    : user
+      ? `${user.nombre} ${user.apellido}`
+      : patientData.name;
+
   const today = new Date();
   const dateStr = today.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const patientAppointments = appointments.filter(a => a.patient === patientData.name);
@@ -29,11 +45,11 @@ function DashboardPaciente() {
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <Sidebar menuItems={menuItems} userRole="Paciente" userName={patientData.name} />
+      <Sidebar menuItems={menuItems} userRole="Paciente" userName={displayName} />
       <div className="flex-1 md:ml-64 p-6 md:p-8">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]">Bienvenido, {patientData.name}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#1F2937]">Bienvenido, {displayName}</h1>
             <p className="text-[#6B7280] mt-1 capitalize">{dateStr}</p>
           </div>
           <RealtimeStatus />

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { appointments } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import { LayoutDashboard, Calendar, Users, ClipboardList, MessageSquare, BarChart3, User, Bell, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
@@ -39,13 +40,14 @@ const statusFilter = {
 };
 
 function Consultas() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('Todas');
 
   const filtered = appointments.filter(statusFilter[activeTab]);
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <Sidebar menuItems={menuItems} userRole="Médico" userName="Dr. Carlos Mendoza" />
+      <Sidebar menuItems={menuItems} userRole="Médico" userName={user ? `Dr. ${user.nombre} ${user.apellido}` : 'Médico'} />
       <div className="flex-1 p-6 md:p-8 md:ml-64">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Consultas Médicas</h1>

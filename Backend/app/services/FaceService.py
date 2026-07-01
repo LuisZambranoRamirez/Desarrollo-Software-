@@ -10,7 +10,7 @@ from security.security import create_access_token
 
 class FaceService:
 
-    MATCH_THRESHOLD = 0.45   # puedes ajustar 0.40 - 0.55
+    MATCH_THRESHOLD = 0.35
 
     @staticmethod
     def register_face(db: Session, usuario_id: int, image_base64: str):
@@ -25,11 +25,13 @@ class FaceService:
 
         if perfil:
             perfil.embedding_json = encoding_json
+            perfil.imagen_referencia = image_base64
             perfil.fecha_actualizacion = datetime.utcnow()
         else:
             perfil = PerfilFacial(
                 usuario_id=usuario_id,
                 embedding_json=encoding_json,
+                imagen_referencia=image_base64,
                 algoritmo="face_recognition",
                 version_modelo="v1"
             )
@@ -40,6 +42,14 @@ class FaceService:
         db.commit()
 
         return usuario
+
+    @staticmethod
+    def get_reference_image(db: Session, usuario_id: int) -> str | None:
+        perfil = db.query(PerfilFacial).filter(
+            PerfilFacial.usuario_id == usuario_id,
+            PerfilFacial.activo == True
+        ).first()
+        return perfil.imagen_referencia if perfil else None
 
     @staticmethod
     def start_face_auth(db: Session, ip_cliente: str = None, user_agent: str = None):
@@ -155,21 +165,14 @@ class FaceService:
             access_token = create_access_token(token_payload)
 
             return {
-            "authenticated": True,
-            "message": "Autenticación facial correcta.",
-            "accessToken": access_token,
-            "tokenType": "bearer",
-            "userId": usuario.id,
-            "fullName": usuario.nombre+usuario.apellido,
-            "role": usuario.rol
-            #"user": {
-            #    "id": usuario.id,
-            #    "email": usuario.email,
-            #    "nombre": usuario.nombre,
-            #    "apellido": usuario.apellido,
-            #    "rol": usuario.rol
-            #}
-        }
+                "authenticated": True,
+                "message": "Autenticación facial correcta.",
+                "accessToken": access_token,
+                "tokenType": "bearer",
+                "userId": usuario.id,
+                "fullName": f"{usuario.nombre} {usuario.apellido}",
+                "role": usuario.rol
+            }
 
         session.estado = "FAILED"
         db.add(IntentoAutenticacionFacial(
@@ -186,7 +189,9 @@ class FaceService:
         return {
             "authenticated": False,
             "message": "No hubo coincidencia facial válida.",
-            "accessToken": None,
-            "tokenType": None,
-            "user": None
+            "accessToken": "",
+            "tokenType": "",
+            "userId": None,
+            "fullName": None,
+            "role": None
         }

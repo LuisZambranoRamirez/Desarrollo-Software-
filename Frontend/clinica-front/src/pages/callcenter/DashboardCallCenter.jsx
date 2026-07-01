@@ -1,8 +1,12 @@
+import { useState, useEffect } from 'react';
 import { callCenterData } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import Table from '../../components/ui/Table.jsx';
+import RealtimeStatus from '../../components/common/RealtimeStatus.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { api } from '../../services/api.js';
 import { LayoutDashboard, Phone, Users, Calendar, Stethoscope, BarChart3, Settings, Headphones, Activity } from 'lucide-react';
 
 const menuItems = [
@@ -40,9 +44,22 @@ function getStatusBadge(status) {
 }
 
 function DashboardCallCenter() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    api.getMe().then(setProfile).catch(() => {});
+  }, []);
+
+  const displayName = profile
+    ? `${profile.nombre} ${profile.apellido}`
+    : user
+      ? `${user.nombre} ${user.apellido}`
+      : 'Laura Mendoza';
+
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <Sidebar menuItems={menuItems} userRole="Call Center" userName="Laura Mendoza" />
+      <Sidebar menuItems={menuItems} userRole="Call Center" userName={displayName} />
       <div className="flex-1 p-6 md:p-8 md:ml-64">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Call Center - Dashboard</h1>

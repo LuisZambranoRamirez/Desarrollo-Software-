@@ -41,10 +41,32 @@ export const api = {
       body: JSON.stringify(credentials),
     }),
 
-  getPacientes: () => request('/pacientes/'),
-
   buscarPacientePorTelefono: (telefono) =>
     request(`/pacientes/buscar?telefono=${encodeURIComponent(telefono)}`),
 
+  post: (path, body) =>
+    request(path, {
+      method: 'POST',
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    }),
+
+  registerPaciente: (data) =>
+    request('/pacientes/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  registerMedico: (data) =>
+    request('/doctores/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  getMe: () => request('/api/auth/me'),
+
+  getReferenceImage: () => request('/api/facial/reference-image'),
+
   getDoctores: () => request('/doctores/'),
+
+  getPacientes: () => request('/pacientes/'),
 };

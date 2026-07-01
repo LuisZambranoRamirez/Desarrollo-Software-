@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { doctorDashboardData } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Button from '../../components/ui/Button.jsx';
 import Input from '../../components/ui/Input.jsx';
@@ -68,6 +69,7 @@ const priorityBadge = {
 };
 
 function Agenda() {
+  const { user } = useAuth();
   const [consultations, setConsultations] = useState(
     doctorDashboardData.upcomingConsultations.map((consultation, index) => ({
       ...consultation,
@@ -155,7 +157,7 @@ function Agenda() {
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <Sidebar menuItems={menuItems} userRole="Médico" userName="Dr. Carlos Mendoza" />
+      <Sidebar menuItems={menuItems} userRole="Médico" userName={user ? `Dr. ${user.nombre} ${user.apellido}` : 'Médico'} />
       <div className="flex-1 p-6 md:p-8 md:ml-64">
         <div className="flex items-center justify-between mb-8">
           <div>

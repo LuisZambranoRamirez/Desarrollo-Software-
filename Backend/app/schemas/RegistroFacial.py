@@ -4,6 +4,11 @@ class FacialRegisterRequest(BaseModel):
     imageBase64: str
 
 
+class FacialRegisterForUserRequest(BaseModel):
+    usuario_id: int
+    imageBase64: str
+
+
 class FacialRegisterResponse(BaseModel):
     success: bool
     message: str

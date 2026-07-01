@@ -5,6 +5,8 @@ import Nosotros from './pages/public/Nosotros';
 import Contacto from './pages/public/Contacto';
 import LoginPaciente from './pages/public/LoginPaciente';
 import LoginMedico from './pages/public/LoginMedico';
+import RegisterPaciente from './pages/public/RegisterPaciente';
+
 import DashboardPaciente from './pages/paciente/DashboardPaciente';
 import MisCitas from './pages/paciente/MisCitas';
 import HistorialMedico from './pages/paciente/HistorialMedico';
@@ -40,6 +42,8 @@ function App() {
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/login-paciente" element={<LoginPaciente />} />
             <Route path="/login-medico" element={<LoginMedico />} />
+            <Route path="/registro-paciente" element={<RegisterPaciente />} />
+
             <Route path="/dashboard-paciente" element={<DashboardPaciente />} />
             <Route path="/dashboard-paciente/citas" element={<MisCitas />} />
             <Route path="/dashboard-paciente/historial" element={<HistorialMedico />} />

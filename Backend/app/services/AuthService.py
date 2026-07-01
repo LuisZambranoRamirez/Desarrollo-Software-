@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.Usuario import Usuario
-from schemas.Auth import LoginRequest
+from schemas.Auth import LoginRequest, UserProfileResponse
 from fastapi import HTTPException, status
 from datetime import datetime
 from security.security import verify_password, create_access_token
@@ -49,4 +49,17 @@ class AuthService:
                 apellido=usuario.apellido,
                 rol=usuario.rol
             )
+        )
+
+    @staticmethod
+    def get_profile(usuario: Usuario) -> UserProfileResponse:
+        return UserProfileResponse(
+            id=usuario.id,
+            email=usuario.email,
+            nombre=usuario.nombre,
+            apellido=usuario.apellido,
+            telefono=usuario.telefono,
+            rol=usuario.rol,
+            activo=usuario.activo,
+            login_facial_habilitado=usuario.login_facial_habilitado,
         )

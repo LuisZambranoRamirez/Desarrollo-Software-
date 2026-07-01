@@ -31,13 +31,19 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
+  const setSession = (accessToken, userData) => {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('authUser', JSON.stringify(userData));
+    setUser(userData);
+  };
+
   const logout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('authUser');
     setUser(null);
   };
 
-  const value = useMemo(() => ({ user, login, logout }), [user]);
+  const value = useMemo(() => ({ user, login, setSession, logout }), [user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

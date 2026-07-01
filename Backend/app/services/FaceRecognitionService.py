@@ -1,7 +1,6 @@
 import json
 import cv2
 import numpy as np
-import face_recognition
 from utils.images import decode_base64_image
 
 
@@ -9,32 +8,30 @@ class FaceRecognitionService:
 
     @staticmethod
     def get_face_encoding_from_base64(image_base64: str):
-        """
-        Recibe una imagen en base64, detecta el rostro y devuelve:
-        - encoding facial
-        - cantidad de rostros detectados
-        """
         image = decode_base64_image(image_base64)
-
         if image is None:
             raise ValueError("No se pudo decodificar la imagen.")
 
-        # face_recognition trabaja mejor en RGB
-        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        )
+        faces = face_cascade.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=5, minSize=(100, 100)
+        )
 
-        face_locations = face_recognition.face_locations(rgb_image)
-        if len(face_locations) == 0:
+        if len(faces) == 0:
             raise ValueError("No se detectó ningún rostro en la imagen.")
-
-        if len(face_locations) > 1:
+        if len(faces) > 1:
             raise ValueError("Se detectaron múltiples rostros. Solo debe haber uno.")
 
-        face_encodings = face_recognition.face_encodings(rgb_image, face_locations)
+        x, y, w, h = faces[0]
+        face_roi = gray[y : y + h, x : x + w]
+        face_resized = cv2.resize(face_roi, (64, 64))
+        encoding = face_resized.flatten().astype(np.float64)
+        encoding = encoding / np.linalg.norm(encoding)
 
-        if not face_encodings:
-            raise ValueError("No se pudo generar el embedding facial.")
-
-        return face_encodings[0], len(face_locations)
+        return encoding, len(faces)
 
     @staticmethod
     def serialize_encoding(encoding: np.ndarray) -> str:
@@ -46,12 +43,12 @@ class FaceRecognitionService:
 
     @staticmethod
     def compare_encodings(known_encodings, candidate_encoding):
-        """
-        Retorna:
-        - índice del mejor match
-        - distancia mínima
-        """
-        distances = face_recognition.face_distance(known_encodings, candidate_encoding)
-        best_index = int(np.argmin(distances))
-        best_distance = float(distances[best_index])
+        similarities = [
+            np.dot(candidate_encoding, known) / (
+                np.linalg.norm(candidate_encoding) * np.linalg.norm(known)
+            )
+            for known in known_encodings
+        ]
+        best_index = int(np.argmax(similarities))
+        best_distance = 1.0 - float(similarities[best_index])
         return best_index, best_distance

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { patientData } from '../../data/mockData';
 import Sidebar from '../../components/layout/Sidebar.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import Button from '../../components/ui/Button.jsx';
@@ -102,6 +103,7 @@ const priorityBadge = {
 };
 
 function HistorialClinico() {
+  const { user } = useAuth();
   const [selectedId, setSelectedId] = useState(patientOptions[0].id);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('Todos');
@@ -135,7 +137,7 @@ function HistorialClinico() {
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
-      <Sidebar menuItems={menuItems} userRole="Médico" userName="Dr. Carlos Mendoza" />
+      <Sidebar menuItems={menuItems} userRole="Médico" userName={user ? `Dr. ${user.nombre} ${user.apellido}` : 'Médico'} />
       <div className="flex-1 p-6 md:p-8 md:ml-64">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Historial Clínico</h1>

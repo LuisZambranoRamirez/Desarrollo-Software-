@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.Usuario import Usuario
 from models.Doctor import Doctor
 from schemas.Medicos import DoctorCreate
@@ -28,3 +28,12 @@ def registrar_doctor(db: Session, doctor_data: DoctorCreate):
     
     doctor_db.usuario = usuario_db
     return doctor_db
+
+
+def listar_doctores(db: Session):
+    return (
+        db.query(Doctor)
+        .options(joinedload(Doctor.usuario))
+        .filter(Doctor.activo == True)
+        .all()
+    )

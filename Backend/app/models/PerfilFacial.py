@@ -13,7 +13,7 @@ class PerfilFacial(Base):
     id = Column(BigInteger, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), nullable=False, unique=True)
     embedding_json = Column(Text, nullable=False)
-    imagen_referencia = Column(String(255))
+    imagen_referencia = Column(Text)
     algoritmo = Column(String(100), default="face_recognition")
     version_modelo = Column(String(50))
     activo = Column(Boolean, default=True)
